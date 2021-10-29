@@ -184,7 +184,7 @@ func (r *Route) addRegexpMatcher(tpl string, typ regexpType) error {
 		}
 	}
 	rr, err := newRouteRegexp(tpl, typ, routeRegexpOptions{
-		strictSlash:    r.strictSlash,
+		strictSlash:    r.acceptTrailingSlash,
 		useEncodedPath: r.useEncodedPath,
 	})
 	if err != nil {

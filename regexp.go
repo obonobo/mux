@@ -101,9 +101,9 @@ func newRouteRegexp(tpl string, typ regexpType, options routeRegexpOptions) (*ro
 	// Add the remaining.
 	raw := tpl[end:]
 	pattern.WriteString(regexp.QuoteMeta(raw))
-	if options.strictSlash {
-		pattern.WriteString("[/]?")
-	}
+	// if options.strictSlash {
+	pattern.WriteString("[/]?")
+	// }
 	if typ == regexpTypeQuery {
 		// Add the default pattern if the query value is empty
 		if queryVal := strings.SplitN(template, "=", 2)[1]; queryVal == "" {
@@ -356,7 +356,13 @@ func (v routeRegexpGroup) setMatch(req *http.Request, m *RouteMatch, r *Route) {
 					} else {
 						u.Path += "/"
 					}
-					m.Handler = http.RedirectHandler(u.String(), http.StatusMovedPermanently)
+
+					// Why would I not just want to match the route? Why would I
+					// ever want an extra slash to perform a redirect?!
+					//
+					// ⌄⌄⌄ This is the stupidest behaviour ⌄⌄⌄
+
+					// m.Handler =http.RedirectHandler(u.String(), http.StatusMovedPermanently)
 				}
 			}
 		}

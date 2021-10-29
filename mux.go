@@ -23,7 +23,12 @@ var (
 
 // NewRouter returns a new router instance.
 func NewRouter() *Router {
-	return &Router{namedRoutes: make(map[string]*Route)}
+	return &Router{
+		namedRoutes: make(map[string]*Route),
+		routeConf: routeConf{
+			acceptTrailingSlash: true,
+		},
+	}
 }
 
 // Router registers routes to be matched and dispatches a handler.
@@ -76,9 +81,8 @@ type routeConf struct {
 	// If true, "/path/foo%2Fbar/to" will match the path "/path/{var}/to"
 	useEncodedPath bool
 
-	// If true, when the path pattern is "/path/", accessing "/path" will
-	// redirect to the former and vice versa.
-	strictSlash bool
+	// If true, treats "/path/" the same as "/path"
+	acceptTrailingSlash bool
 
 	// If true, when the path pattern is "/path//to", accessing "/path//to"
 	// will not redirect
@@ -186,11 +190,12 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			// http://code.google.com/p/go/issues/detail?id=5252
 			url := *req.URL
 			url.Path = p
-			p = url.String()
+			// p = url.String()
 
-			w.Header().Set("Location", p)
-			w.WriteHeader(http.StatusMovedPermanently)
-			return
+			// ⌄⌄⌄ No redirect, just tweak path ⌄⌄⌄
+			// w.Header().Set("Location", p)
+			// w.WriteHeader(http.StatusMovedPermanently)
+			// return
 		}
 	}
 	var match RouteMatch
@@ -243,7 +248,7 @@ func (r *Router) GetRoute(name string) *Route {
 // be determined from a prefix alone. However, any subrouters created from that
 // route inherit the original StrictSlash setting.
 func (r *Router) StrictSlash(value bool) *Router {
-	r.strictSlash = value
+	r.acceptTrailingSlash = !value
 	return r
 }
 

@@ -1476,7 +1476,7 @@ func TestStrictSlash(t *testing.T) {
 			host:           "",
 			path:           "/111/",
 			shouldMatch:    true,
-			shouldRedirect: true,
+			shouldRedirect: false,
 		},
 		{
 			title:          "Do not redirect path with slash",
@@ -1496,7 +1496,7 @@ func TestStrictSlash(t *testing.T) {
 			host:           "",
 			path:           "/111",
 			shouldMatch:    true,
-			shouldRedirect: true,
+			shouldRedirect: false,
 		},
 		{
 			title:          "Do not redirect path without slash",
@@ -1516,7 +1516,7 @@ func TestStrictSlash(t *testing.T) {
 			host:           "",
 			path:           "/static/images/",
 			shouldMatch:    true,
-			shouldRedirect: true,
+			shouldRedirect: false,
 		},
 		{
 			title:          "Ignore StrictSlash for path prefix",
@@ -1976,8 +1976,11 @@ func Test301Redirect(t *testing.T) {
 	}
 	r.ServeHTTP(&res, req)
 
-	if "http://localhost/api/?abc=def" != res.hh["Location"][0] {
-		t.Errorf("Should have complete URL with query string")
+	// if "http://localhost/api/?abc=def" != res.hh["Location"][0] {
+	// 	t.Errorf("Should have complete URL with query string")
+	// }
+	if _, ok := res.hh["Location"]; ok {
+		t.Error("Should have no location header, why would we redirect?")
 	}
 }
 
@@ -2663,22 +2666,22 @@ func Test_copyRouteConf(t *testing.T) {
 		{
 			"full",
 			routeConf{
-				useEncodedPath: true,
-				strictSlash:    true,
-				skipClean:      true,
-				regexp:         routeRegexpGroup{host: r, path: r, queries: []*routeRegexp{r}},
-				matchers:       []matcher{m},
-				buildScheme:    "https",
-				buildVarsFunc:  b,
+				useEncodedPath:      true,
+				acceptTrailingSlash: false,
+				skipClean:           true,
+				regexp:              routeRegexpGroup{host: r, path: r, queries: []*routeRegexp{r}},
+				matchers:            []matcher{m},
+				buildScheme:         "https",
+				buildVarsFunc:       b,
 			},
 			routeConf{
-				useEncodedPath: true,
-				strictSlash:    true,
-				skipClean:      true,
-				regexp:         routeRegexpGroup{host: r, path: r, queries: []*routeRegexp{r}},
-				matchers:       []matcher{m},
-				buildScheme:    "https",
-				buildVarsFunc:  b,
+				useEncodedPath:      true,
+				acceptTrailingSlash: false,
+				skipClean:           true,
+				regexp:              routeRegexpGroup{host: r, path: r, queries: []*routeRegexp{r}},
+				matchers:            []matcher{m},
+				buildScheme:         "https",
+				buildVarsFunc:       b,
 			},
 		},
 	}
